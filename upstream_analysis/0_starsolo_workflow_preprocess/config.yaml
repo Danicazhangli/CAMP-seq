@@ -1,0 +1,25 @@
+workdir: .
+dry_run: true
+cleanup: false
+rt8codes_fasta: ../../ref/rt8codes.fasta
+samples:
+    211523C_Chip_Trans:
+        R1_file: 211523C_Chip_Trans
+        R2_file: 211523C_Chip_Trans
+        pattern: ^.*_L(\d{3})_R([1,2]).*.fastq.gz$
+        chem: DropSeq
+    211523F_Gel_trans:
+        R1_file: 211523F_Gel_trans
+        R2_file: 211523F_Gel_trans
+        pattern: ^.*_L(\d{3})_R([1,2]).*.fastq.gz$
+        chem: CapitalbioSeq
+    ZT-205:
+        R1_file: ZT-205-ZT-205-1/ZT-205-ZT-205-1_R1.fastq.gz
+        R2_file: ZT-205-ZT-205-1/ZT-205-ZT-205-1_R2.fastq.gz
+        pattern: .*
+        chem: CapitalbioSeq
+    ZT-238:
+        R1_file: BAJD-20240607-L-01-2024-06-271436/ZT-238-ZT-238/
+        R2_file: BAJD-20240607-L-01-2024-06-271436/ZT-238-ZT-238/
+        pattern: ^.*_L(\d{3})_R([1,2]).*.fastq.gz$
+        chem: CapitalbioSeq-CB4

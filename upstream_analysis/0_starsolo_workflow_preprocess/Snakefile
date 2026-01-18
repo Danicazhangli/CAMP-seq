@@ -1,0 +1,65 @@
+configfile: "config.yaml"
+workdir: config["workdir"]
+
+samples = config["samples"]
+sample_names = samples.keys()
+
+rule all:
+    input:
+        ## s1 merge_fastq
+        # expand("outputs/{sample_name}_R1.fastq.gz", sample_name=sample_names),
+        # expand("outputs/{sample_name}_R2.fastq.gz", sample_name=sample_names),
+        ## s2 cutadapt
+        # expand("outputs/demultiplexing/{sample_name}/cutadapt_done", sample_name=sample_names),
+        ## s3 patch
+        expand("outputs/{sample_name}/{sample_name}_R1.patched.fastq.gz", sample_name=sample_names),
+        expand("outputs/{sample_name}/{sample_name}_R2.patched.fastq.gz", sample_name=sample_names),
+
+rule clean:
+    input:
+        outputs="outputs"
+    shell:
+        "rm -rf {input.outputs}"
+
+rule merge_fastq:
+    input:
+        R1_file=lambda wildcards: f"{samples[wildcards.sample_name]['R1_file']}",
+        R2_file=lambda wildcards: f"{samples[wildcards.sample_name]['R2_file']}"
+    output:
+        R1_merged="outputs/{sample_name}_R1.fastq.gz",
+        R2_merged="outputs/{sample_name}_R2.fastq.gz"
+    threads: 2
+    params:
+        dry_run=config["dry_run"],
+        pattern=lambda wildcards: f"{samples[wildcards.sample_name]['pattern']}",
+    script:
+        "merge_fastq.py"
+
+rule cutadapt:
+    input:
+        R1_file=lambda wildcards: f"outputs/{wildcards.sample_name}_R1.fastq.gz",
+        R2_file=lambda wildcards: f"outputs/{wildcards.sample_name}_R2.fastq.gz",
+    output:
+        R1R2_Cutadapt="outputs/demultiplexing/{sample_name}/cutadapt_done"
+    threads: 20
+    params:
+        dry_run=config["dry_run"],
+        chem=lambda wildcards: f"{samples[wildcards.sample_name]['chem']}",
+        rt8codes_fasta=config['rt8codes_fasta']
+    script:
+        "run_cutadapt.py"
+
+rule patch:
+    input:
+        R1R2_Cutadapt=lambda wildcards: f"outputs/demultiplexing/{wildcards.sample_name}/cutadapt_done",
+    output:
+        R1_patched="outputs/{sample_name}/{sample_name}_R1.patched.fastq.gz",
+        R2_patched="outputs/{sample_name}/{sample_name}_R2.patched.fastq.gz"
+    threads: 24
+    params:
+        cleanup=config["cleanup"],
+        dry_run=config["dry_run"],
+        chem=lambda wildcards: f"{samples[wildcards.sample_name]['chem']}",
+        rt8codes_fasta=config['rt8codes_fasta']
+    script:
+        "patch.py"

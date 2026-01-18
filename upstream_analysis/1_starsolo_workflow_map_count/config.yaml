@@ -1,0 +1,10 @@
+workdir: .
+dry_run: true
+cleanup: false
+samples:
+    ZT-238-noCB4:
+        R1R2_files: ZT-238-noCB4
+        strand: Reverse
+        chem: CapitalbioSeq
+        extra_whitelist: "ref/rt8codes_whitelist_starsolo.txt"
+        starindex: "ref/STAR/GRCh38_and_GRCm39_patched"

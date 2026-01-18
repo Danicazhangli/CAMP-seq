@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+# package-data = { "sample" = ["*.dat"] }
+packages = [
+    "toolbox",
+]
+include-package-data = true
+
+[project]
+name = "toolbox"
+version = "0.0.1"
+description = "Toolbox for utilities"
+readme = "README.md"
+requires-python = ">=3.9"
+# license = { file = "LICENSE.txt" }
+keywords = ["sample", "setuptools", "development"]
+authors = [
+    { name = "riseyoung", email = "jsbyysheng@gmail.com" }
+]
+maintainers = [
+    { name = "riseyoung", email = "jsbyysheng@gmail.com" }
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Build Tools",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "numpy>=1.24.4, <=1.26.4",
+    "h5py",
+    "requests>=2.32.3",
+    "aiohttp>=3.11.18",
+    "tomli; python_version < '3.11'",
+]

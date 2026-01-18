@@ -1,0 +1,53 @@
+configfile: "config.yaml"
+workdir: config["workdir"]
+
+samples = config["samples"]
+sample_names = samples.keys()
+
+host_addr = socketio.get_interface_ip()
+workflow_name = "starsolo_workflow_map_count"
+
+rule all:
+    input:
+        # s1 umitools_whitelist
+        # expand("outputs/{sample_name}/umitools_whitelist/whitelist1/whitelist_starsolo.txt", sample_name=sample_names),
+        # expand("outputs/{sample_name}/umitools_whitelist/whitelist2/whitelist_starsolo.txt", sample_name=sample_names),
+        # expand("outputs/{sample_name}/umitools_whitelist/whitelist3/whitelist_starsolo.txt", sample_name=sample_names),
+        # s2 starsolo
+        expand("outputs/{sample_name}/starsolo_done", sample_name=sample_names)
+
+rule clean:
+    input:
+        outputs="outputs"
+    shell:
+        "rm -rf {input.outputs}"
+
+rule umitools_whitelist:
+    input:
+        readsFiles=lambda wildcards: f"{samples[wildcards.sample_name]['R1R2_files']}"
+    output:
+        whitelist1="outputs/{sample_name}/umitools_whitelist/whitelist1/whitelist_starsolo.txt",
+        whitelist2="outputs/{sample_name}/umitools_whitelist/whitelist2/whitelist_starsolo.txt",
+        whitelist3="outputs/{sample_name}/umitools_whitelist/whitelist3/whitelist_starsolo.txt"
+    threads: 3
+    params:
+        chem=lambda wildcards: f"{samples[wildcards.sample_name]['chem']}"
+    script:
+        "generate_whitelist.py"
+
+rule starsolo:
+    input:
+        whitelist1=lambda wildcards: ancient(f"outputs/{wildcards.sample_name}/umitools_whitelist/whitelist1/whitelist_starsolo.txt"),
+        whitelist2=lambda wildcards: ancient(f"outputs/{wildcards.sample_name}/umitools_whitelist/whitelist2/whitelist_starsolo.txt"),
+        whitelist3=lambda wildcards: ancient(f"outputs/{wildcards.sample_name}/umitools_whitelist/whitelist3/whitelist_starsolo.txt"),
+        readsFiles=lambda wildcards: f"{samples[wildcards.sample_name]['R1R2_files']}"
+    output:
+        R1R2_StarSolo="outputs/{sample_name}/starsolo_done"
+    threads: 20
+    params:
+        strand=lambda wildcards: f"{samples[wildcards.sample_name]['strand']}",
+        chem=lambda wildcards: f"{samples[wildcards.sample_name]['chem']}",
+        starindex=lambda wildcards: f"{samples[wildcards.sample_name]['starindex']}",
+        extra_whitelist=lambda wildcards: f"{samples[wildcards.sample_name]['extra_whitelist']}",
+    script:
+        "run_starsolo.py"
